@@ -45,8 +45,11 @@ export const todo = createSlice({
       const todo = state.list.find((todo) => todo.id === action.payload);
       if (todo) todo.done = !todo.done;
     },
+    updateTaskList: (state, action) => {
+      state.list = action.payload;
+    },
   },
 });
 
-export const {addTodo, editTodo, removeTodo, toggleTodo} = todo.actions;
+export const {addTodo, editTodo, removeTodo, toggleTodo, updateTaskList} = todo.actions;
 export default todo.reducer;
