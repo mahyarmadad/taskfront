@@ -1,3 +1,4 @@
+import StoreProvider from "@Components/StoreProvider";
 import ThemeRegistry from "@Components/ThemeRegistry";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -22,7 +23,9 @@ export default function RootLayout({children}: Props) {
   return (
     <html lang="en">
       <body>
-        <ThemeRegistry>{children}</ThemeRegistry>
+        <ThemeRegistry>
+          <StoreProvider>{children}</StoreProvider>
+        </ThemeRegistry>
       </body>
     </html>
   );

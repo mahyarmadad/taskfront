@@ -6,3 +6,6 @@ export interface TASK {
   createdAt: Date;
   updatedAt: Date;
 }
+export interface TASKLIST {
+  list: TASK[];
+}
