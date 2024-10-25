@@ -1,10 +1,10 @@
 export interface TASK {
-  id: string;
+  _id: string;
   title: string;
   description: string;
-  done: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  completed: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 export interface TASKLIST {
   list: TASK[];

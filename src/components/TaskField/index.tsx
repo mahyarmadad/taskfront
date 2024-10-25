@@ -6,6 +6,8 @@ import {LoadingButton} from "@mui/lab";
 import {Button, TextField} from "@mui/material";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {addTodo, editTodo} from "@Functions/todo-slice";
+import {addTask, updateTask} from "@Functions/todo";
+import {useSnackbar} from "notistack";
 
 interface TaskState {
   title: string;
@@ -16,14 +18,19 @@ export default function TaskField(): React.JSX.Element {
     title: "",
     description: "",
   });
+  const [loading, setLoading] = useState<boolean>(false);
 
   const editedTask = useAppSelector((state) => state.editTaskReducer.task);
   const dispatch = useAppDispatch();
+  const {enqueueSnackbar} = useSnackbar();
 
-  const buttonDisable = useMemo(() => !inputTask.title || !inputTask.description, [inputTask]);
+  const buttonDisable = useMemo(
+    () => !inputTask.title.trim() || !inputTask.description.trim(),
+    [inputTask],
+  );
 
   const handleTaskChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim();
+    const value = e.target.value;
     const name = e.target.name;
     setInputTask((prev) => ({...prev, [name]: value}));
   }, []);
@@ -36,12 +43,28 @@ export default function TaskField(): React.JSX.Element {
     });
   }, [dispatch]);
 
-  const handleAddEditTask = useCallback(() => {
-    const fun = editedTask ? editTodo : addTodo;
-    const value = editedTask ? {...inputTask, id: editedTask.id} : inputTask;
-    dispatch(fun(value));
+  const handleAddEditTask = useCallback(async () => {
+    try {
+      if (editedTask) {
+        const updatedTask = await updateTask({
+          ...inputTask,
+          id: editedTask._id,
+          completed: editedTask.completed,
+        });
+        dispatch(editTodo(updatedTask));
+      } else {
+        const newTask = await addTask(inputTask);
+        dispatch(addTodo(newTask));
+      }
+    } catch (error) {
+      const errorMsg = (error as Error).message;
+      enqueueSnackbar(errorMsg, {variant: "error"});
+    } finally {
+      setLoading(false);
+    }
+
     handleClearForm();
-  }, [editedTask, dispatch, inputTask, handleClearForm]);
+  }, [handleClearForm, editedTask, inputTask, dispatch, enqueueSnackbar]);
 
   useEffect(() => {
     if (!editedTask) return;
@@ -90,6 +113,7 @@ export default function TaskField(): React.JSX.Element {
             variant="contained"
             size="large"
             fullWidth
+            loading={loading}
             disabled={buttonDisable}
             onClick={handleAddEditTask}>
             {editedTask ? "Make Change" : "I Got This"}

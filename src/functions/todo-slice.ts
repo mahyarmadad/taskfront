@@ -1,27 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {TASKLIST} from "@Types";
 
-const FAKE_TASKS = [
-  {
-    id: "1",
-    title: "task 1",
-    description: "avadga",
-    done: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "2",
-    title: "task 2",
-    description: "agasgas",
-    done: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
-
 const INITIAL_STATE: TASKLIST = {
-  list: FAKE_TASKS,
+  list: [],
 };
 
 export const todo = createSlice({
@@ -29,21 +10,18 @@ export const todo = createSlice({
   initialState: INITIAL_STATE,
   reducers: {
     addTodo: (state, action) => {
-      const todo = state.list.find((todo) => todo.id === action.payload.id);
+      const todo = state.list.find((todo) => todo._id === action.payload._id);
       if (!todo) state.list.push(action.payload);
     },
     editTodo: (state, action) => {
-      const todo = state.list.find((todo) => todo.id === action.payload.id);
-      if (todo) {
-        todo.title = action.payload.title;
-      }
+      const exist = state.list.find((todo) => todo._id === action.payload._id);
+      if (exist)
+        state.list = state.list.map((todo) =>
+          todo._id === action.payload._id ? action.payload : todo,
+        );
     },
     removeTodo: (state, action) => {
-      state.list = state.list.filter((todo) => todo.id !== action.payload);
-    },
-    toggleTodo: (state, action) => {
-      const todo = state.list.find((todo) => todo.id === action.payload);
-      if (todo) todo.done = !todo.done;
+      state.list = state.list.filter((todo) => todo._id !== action.payload);
     },
     updateTaskList: (state, action) => {
       state.list = action.payload;
@@ -51,5 +29,5 @@ export const todo = createSlice({
   },
 });
 
-export const {addTodo, editTodo, removeTodo, toggleTodo, updateTaskList} = todo.actions;
+export const {addTodo, editTodo, removeTodo, updateTaskList} = todo.actions;
 export default todo.reducer;

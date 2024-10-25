@@ -1,16 +1,19 @@
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 import {setTask} from "@Functions/editTask-slice";
-import {removeTodo, toggleTodo} from "@Functions/todo-slice";
+import {deleteTask, updateTask} from "@Functions/todo";
+import {removeTodo} from "@Functions/todo-slice";
 import {useAppDispatch} from "@Hooks/redux";
-import {Checkbox, Collapse, IconButton, Typography} from "@mui/material";
+import {Checkbox, CircularProgress, Collapse, IconButton, Typography} from "@mui/material";
 import {TASK} from "@Types";
-import {useCallback, useState} from "react";
+import {useSnackbar} from "notistack";
+import {useCallback, useMemo, useState} from "react";
 import {
   ContentEditEditOutline,
   EssetionalMenuOutline,
   EssetionalTrashOutline,
 } from "react-icons-sax";
+import {editTodo} from "../../functions/todo-slice";
 interface TaskItemProps {
   task: TASK;
 }
@@ -19,18 +22,38 @@ const prevent = (e: React.MouseEvent) => {
   e.preventDefault();
 };
 export default function TaskItem({task}: TaskItemProps): React.JSX.Element {
+  const [loading, setLoading] = useState<string | null>(null);
   const [openDescription, setOpenDescription] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: task.id});
+  const {attributes, listeners, setNodeRef, transform, transition} = useSortable({id: task._id});
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = useMemo(
+    () => ({
+      transform: CSS.Transform.toString(transform),
+      transition,
+    }),
+    [transform, transition],
+  );
 
-  const handleToggleTask = useCallback(() => {
-    dispatch(toggleTodo(task.id));
-  }, [dispatch, task.id]);
+  const {enqueueSnackbar} = useSnackbar();
+  const handleToggleTask = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      try {
+        const value = e.target.checked;
+        const updatedTask = await updateTask({
+          id: task._id,
+          title: task.title,
+          description: task.description,
+          completed: value,
+        });
+        dispatch(editTodo(updatedTask));
+      } catch (error) {
+        const errorMsg = (error as Error).message;
+        enqueueSnackbar(errorMsg, {variant: "error"});
+      }
+    },
+    [dispatch, enqueueSnackbar, task],
+  );
 
   const handleEditTask = useCallback(
     (e: React.MouseEvent) => {
@@ -41,26 +64,36 @@ export default function TaskItem({task}: TaskItemProps): React.JSX.Element {
   );
 
   const handleDeleteTask = useCallback(
-    (e: React.MouseEvent) => {
+    async (e: React.MouseEvent) => {
       prevent(e);
-      dispatch(removeTodo(task.id));
+      try {
+        const id = task._id;
+        setLoading(id);
+        await deleteTask(id);
+        dispatch(removeTodo(task._id));
+      } catch (error) {
+        const errorMsg = (error as Error).message;
+        enqueueSnackbar(errorMsg, {variant: "error"});
+      } finally {
+        setLoading(null);
+      }
     },
-    [dispatch, task.id],
+    [dispatch, enqueueSnackbar, task],
   );
 
-  const handleItemClick = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const handleItemClick = useCallback(() => {
     setOpenDescription((prev) => !prev);
   }, []);
 
   return (
     <div
-      className="w-full max-w-xl border border-solid border-gray-500 rounded-2xl pl-4"
+      className="w-full max-w-xl border border-solid border-gray-500 rounded-2xl pl-2"
       ref={setNodeRef}
       style={style}
       {...attributes}>
       <div className="flex items-center">
         <EssetionalMenuOutline className="hover:cursor-move" {...listeners} />
-        <Checkbox checked={task.done} onChange={handleToggleTask} />
+        <Checkbox checked={task.completed} onChange={handleToggleTask} />
         <div onClick={handleItemClick} className="w-full rounded-2xl hover:cursor-pointer">
           <div className="flex items-center justify-between ">
             <div className="flex items-center gap-2">
@@ -70,8 +103,8 @@ export default function TaskItem({task}: TaskItemProps): React.JSX.Element {
               <IconButton onClick={handleEditTask}>
                 <ContentEditEditOutline />
               </IconButton>
-              <IconButton color="error" onClick={handleDeleteTask}>
-                <EssetionalTrashOutline />
+              <IconButton color="error" onClick={handleDeleteTask} disabled={loading === task._id}>
+                {loading === task._id ? <CircularProgress size={20} /> : <EssetionalTrashOutline />}
               </IconButton>
             </div>
           </div>
