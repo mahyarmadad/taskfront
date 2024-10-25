@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Todo List Application
 
-## Getting Started
+This project is a Next.js-based todo list application that utilizes Redux for state management, Tailwind CSS for styling, Material UI (MUI) components, and DND Kit for drag-and-drop functionality.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Add, edit, update, and delete tasks
+- Reorder tasks using drag-and-drop functionality
+- Responsive design optimized for various devices
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To set up and run the project, follow these steps:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Install dependencies:
 
-## Learn More
+   ```
+   pnpm or npm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Start the development server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Open http://localhost:5501 in your browser to view the application.
 
-## Deploy on Vercel
+## Technologies Used
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js**: Server-side rendering framework for React applications
+- **Redux**: State management library for predictable data flows
+- **Tailwind CSS**: Utility-first CSS framework for rapid UI development
+- **Material UI (MUI)**: React component library for building beautiful UIs
+- **DND Kit**: Drag and drop library for creating interactive interfaces
+- **Axios**: Promise-based HTTP client for making API requests
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This README.md file provides an overview of your Todo List application, including its features, installation instructions, technology stack, project structure, and licensing information. It gives potential users and contributors a clear understanding of what the project is about and how to get started with it.
+
+Remember to create a LICENSE.md file in your project root directory with the appropriate license text. If you haven't already done so, you should choose and add an appropriate open-source license to your project.
